@@ -322,7 +322,7 @@ class Language
 
     public static function err(string $key, string $module = null): string
     {
-        return self::preventXSS(self::getError($key, $module));
+        return self::getError($key, $module);
     }
 
     public static function lbl(string $key, string $module = null): string
@@ -332,7 +332,7 @@ class Language
 
     public static function msg(string $key, string $module = null): string
     {
-        return self::preventXSS(self::getMessage($key, $module));
+        return self::getMessage($key, $module);
     }
 
     public static function isActiveLanguage(string $language): bool
