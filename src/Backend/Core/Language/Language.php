@@ -304,6 +304,14 @@ class Language
         }
     }
 
+    public static function preventXSS(string $str): string
+    {
+        $config = \HTMLPurifier_Config::createDefault();
+        $purifier = new \HTMLPurifier($config);
+        $clean_html = $purifier->purify($str);
+        return $clean_html;
+    }
+
     /**
      * @param string $language The language to use, if not provided we will use the working language.
      */
@@ -319,7 +327,8 @@ class Language
 
     public static function lbl(string $key, string $module = null): string
     {
-        return self::getLabel($key, $module);
+        // return htmlspecialchars(self::getLabel($key, $module), ENT_QUOTES, 'UTF-8');
+        return self::preventXSS(self::getLabel($key, $module));
     }
 
     public static function msg(string $key, string $module = null): string

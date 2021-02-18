@@ -47,7 +47,8 @@
         "tijsverkoyen/akismet": "1.1.*",
         "tijsverkoyen/css-to-inline-styles": "1.5.*",
         "phpoffice/phpspreadsheet": "^1.12",
-        "composer/package-versions-deprecated": "^1.11"
+        "composer/package-versions-deprecated": "^1.11",
+        "ezyang/htmlpurifier": "^4.13"
     },
     "require-dev": {
         "jdorn/sql-formatter": "1.2.17",
