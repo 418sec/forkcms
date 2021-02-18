@@ -322,18 +322,17 @@ class Language
 
     public static function err(string $key, string $module = null): string
     {
-        return self::getError($key, $module);
+        return self::preventXSS(self::getError($key, $module));
     }
 
     public static function lbl(string $key, string $module = null): string
     {
-        // return htmlspecialchars(self::getLabel($key, $module), ENT_QUOTES, 'UTF-8');
         return self::preventXSS(self::getLabel($key, $module));
     }
 
     public static function msg(string $key, string $module = null): string
     {
-        return self::getMessage($key, $module);
+        return self::preventXSS(self::getMessage($key, $module));
     }
 
     public static function isActiveLanguage(string $language): bool
