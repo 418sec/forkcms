@@ -246,7 +246,7 @@ class MediaItem implements JsonSerializable
         $mediaItem->title = $mediaItemDataTransferObject->title;
         $mediaItem->folder = $mediaItemDataTransferObject->folder;
         $mediaItem->userId = $mediaItemDataTransferObject->userId;
-        $mediaItem->url = $mediaItemDataTransferObject->url;
+        $mediaItem->url = htmlspecialchars($mediaItemDataTransferObject->url);
 
         return $mediaItem;
     }
