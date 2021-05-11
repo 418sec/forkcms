@@ -87,7 +87,12 @@ class Meta
     private $custom;
 
     /**
-     * @var array|null|string
+     * @var array
+     */
+    private $unserialisedData;
+
+    /**
+     * @var string|null
      *
      * Only can be string during persisting or updating in the database as it then contains the serialised value
      *
@@ -118,10 +123,12 @@ class Meta
         bool $titleOverwrite,
         string $url,
         bool $urlOverwrite,
+        ?string $canonicalUrl,
+        bool $canonicalUrlOverwrite,
         string $custom = null,
         SEOFollow $seoFollow = null,
         SEOIndex $seoIndex = null,
-        array $data = [],
+        array $unserialisedData = [],
         int $id = null
     ) {
         $this->keywords = $keywords;
@@ -133,10 +140,18 @@ class Meta
         $this->url = $url;
         $this->urlOverwrite = $urlOverwrite;
         $this->custom = $custom;
-        $this->data = $data;
+        $this->unserialisedData = $unserialisedData;
         $this->seoFollow = $seoFollow;
         $this->seoIndex = $seoIndex;
         $this->id = $id;
+
+        if ($canonicalUrlOverwrite) {
+            $this->unserialisedData['canonical_url'] = $canonicalUrl;
+            $this->unserialisedData['canonical_url_overwrite'] = $canonicalUrlOverwrite;
+        } else {
+            unset($this->unserialisedData['canonical_url']);
+            unset($this->unserialisedData['canonical_url_overwrite']);
+        }
     }
 
     public function update(
@@ -148,10 +163,12 @@ class Meta
         bool $titleOverwrite,
         string $url,
         bool $urlOverwrite,
+        ?string $canonicalUrl = null,
+        bool $canonicalUrlOverwrite = false,
         string $custom = null,
         SEOFollow $seoFollow = null,
         SEOIndex $seoIndex = null,
-        array $data = []
+        array $unserialisedData = []
     ) {
         $this->keywords = $keywords;
         $this->keywordsOverwrite = $keywordsOverwrite;
@@ -162,9 +179,17 @@ class Meta
         $this->url = $url;
         $this->urlOverwrite = $urlOverwrite;
         $this->custom = $custom;
-        $this->data = $data;
+        $this->unserialisedData = $unserialisedData;
         $this->seoFollow = $seoFollow;
         $this->seoIndex = $seoIndex;
+
+        if ($canonicalUrlOverwrite) {
+            $this->unserialisedData['canonical_url'] = $canonicalUrl;
+            $this->unserialisedData['canonical_url_overwrite'] = $canonicalUrlOverwrite;
+        } else {
+            unset($this->unserialisedData['canonical_url']);
+            unset($this->unserialisedData['canonical_url_overwrite']);
+        }
     }
 
     /**
@@ -173,8 +198,8 @@ class Meta
      */
     public function serialiseData()
     {
-        if (!empty($this->data)) {
-            $this->data = serialize($this->data);
+        if (!empty($this->unserialisedData)) {
+            $this->data = serialize($this->unserialisedData);
 
             return;
         }
@@ -190,12 +215,12 @@ class Meta
     public function unSerialiseData()
     {
         if ($this->data === null) {
-            $this->data = [];
+            $this->unserialisedData = [];
 
             return;
         }
 
-        $this->data = unserialize($this->data, ['allowed_classes' => false]);
+        $this->unserialisedData = unserialize($this->data, ['allowed_classes' => false]);
     }
 
     public static function fromBackendMeta(BackendMeta $meta): self
@@ -211,6 +236,8 @@ class Meta
             $metaData['title_overwrite'],
             $metaData['url'],
             $metaData['url_overwrite'],
+            $metaData['canonical_url'],
+            $metaData['canonical_url_overwrite'],
             $metaData['custom'],
             array_key_exists('SEOFollow', $metaData) ? SEOFollow::fromString((string) $metaData['SEOFollow']) : null,
             array_key_exists('SEOIndex', $metaData) ? SEOIndex::fromString((string) $metaData['SEOIndex']) : null,
@@ -237,6 +264,8 @@ class Meta
             $metaData['titleOverwrite'],
             $metaData['url'],
             $metaData['urlOverwrite'],
+            $metaData['canonical_url'],
+            $metaData['canonical_url_overwrite'],
             $metaData['custom'] ?? null,
             SEOFollow::fromString((string) $metaData['SEOFollow']),
             SEOIndex::fromString((string) $metaData['SEOIndex']),
@@ -290,6 +319,24 @@ class Meta
         return $this->urlOverwrite;
     }
 
+    public function getCanonicalUrl(): ?string
+    {
+        if (array_key_exists('canonical_url', $this->unserialisedData)) {
+            return $this->unserialisedData['canonical_url'];
+        }
+
+        return null;
+    }
+
+    public function isCanonicalUrlOverwrite(): bool
+    {
+        if (array_key_exists('canonicalUrlOverwrite', $this->unserialisedData)) {
+            return (bool) $this->unserialisedData['canonical_url_overwrite'];
+        }
+
+        return false;
+    }
+
     public function getCustom(): ?string
     {
         return $this->custom;
@@ -297,7 +344,7 @@ class Meta
 
     public function getData(): array
     {
-        return $this->data;
+        return $this->unserialisedData;
     }
 
     public function hasSEOIndex(): bool

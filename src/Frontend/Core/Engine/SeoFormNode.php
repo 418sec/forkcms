@@ -4,12 +4,13 @@ namespace Frontend\Core\Engine;
 
 use Backend\Core\Language\Language as BackendLanguage;
 use SpoonFilter;
-use Twig_Compiler;
+use Twig\Compiler;
+use Twig\Node\Node;
 
 /**
  * Twig node for writing the SEO form
  */
-class SeoFormNode extends \Twig_Node
+class SeoFormNode extends Node
 {
     private $form;
 
@@ -25,7 +26,7 @@ class SeoFormNode extends \Twig_Node
         $this->form = $form;
     }
 
-    public function compile(Twig_Compiler $compiler): void
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->addDebugInfo($this)
@@ -126,7 +127,7 @@ class SeoFormNode extends \Twig_Node
             ->write('echo "<h2 class=\"panel-title\">' . $this->lbl('URL') . '</h2>";')
             ->write('echo \'</div>\';')
             ->write('echo \'<div class="panel-body">\';')
-            ->write('echo \'<div class="form-group last">\';')
+            ->write('echo \'<div class="form-group">\';')
             ->write('echo \'<ul class="list-unstyled checkboxTextFieldCombo">\';')
             ->write('echo \'<li class="checkbox">\';')
             ->write('echo "<p><label for=\"urlOverwrite\">";')
@@ -151,6 +152,19 @@ class SeoFormNode extends \Twig_Node
             ->write($this->getField('url'))
             ->write('echo \'</div>\';')
             ->write('echo "<p class=\"help-block\">' . $this->msg('HelpMetaURL') . '</p>";')
+            ->write('echo \'</li>\';')
+            ->write('echo \'</ul>\';')
+            ->write('echo \'</div>\';')
+            ->write('echo \'<div class="form-group last">\';')
+            ->write('echo \'<ul class="list-unstyled checkboxTextFieldCombo">\';')
+            ->write('echo \'<li class="checkbox">\';')
+            ->write('echo "<p><label for=\"canonicalUrlOverwrite\">";')
+            ->write($this->getField('canonical_url_overwrite'))
+            ->write('echo "' . $this->lbl('CanonicalURL') . '</label></p>";')
+            ->write($this->getError('canonical_url'))
+            ->write('echo "<label for=\"canonicalUrl\" class=\"sr-only\">";')
+            ->write('echo "' . $this->lbl('URL') . '</label>";')
+            ->write($this->getField('canonical_url'))
             ->write('echo \'</li>\';')
             ->write('echo \'</ul>\';')
             ->write('echo \'</div>\';')

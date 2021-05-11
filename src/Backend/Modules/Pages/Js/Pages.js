@@ -787,6 +787,29 @@ jsBackend.pages.extras = {
   },
 
   /**
+   * Creates the html for an anchor field
+   */
+  getAnchorFieldHtml: function (text, label, key) {
+    var html = '<div class="panel panel-default" id="user-template-anchor-' + key + '">'
+
+    html += '<div class="panel-heading">'
+    html += '<h2 class="panel-title">' + label + '</h2>'
+    html += '</div>'
+
+    html += '<div class="panel-body">'
+
+    html += '<div class="form-group last">'
+    html += '<input data-ft-anchor="' + label + '" type="text" class="form-control" value="' + text + '" />'
+    html += '</div>'
+
+    html += '</div>'
+
+    html += '</div>'
+
+    return html
+  },
+
+  /**
    * Creates the html for an editor
    */
   getEditorFieldHtml: function (text, label, key) {
@@ -896,6 +919,12 @@ jsBackend.pages.extras = {
     // replace text
     if ($element.is('[data-ft-type="text"]')) {
       $placeholder.append(jsBackend.pages.extras.getTextFieldHtml($element.text(), $element.data('ft-label'), key))
+
+      return
+    }
+
+    if ($element.is('[data-ft-type="anchor"]')) {
+      $placeholder.append(jsBackend.pages.extras.getAnchorFieldHtml($element.text(), $element.data('ft-label'), key))
 
       return
     }
@@ -1030,6 +1059,7 @@ jsBackend.pages.extras = {
 
   saveCustomField: function ($element, key, $placeholder) {
     var $labelField
+    var $anchorField
     var $urlField
     var $img
     var $textarea
@@ -1040,6 +1070,20 @@ jsBackend.pages.extras = {
 
       $element.attr('href', $urlField.val())
       $element.text($labelField.val())
+
+      return
+    }
+
+    if ($element.is('[data-ft-type="anchor"]')) {
+      $anchorField = $placeholder.find('#user-template-anchor-' + key + ' input[data-ft-anchor]')
+
+      if ($anchorField.val() === '') {
+        $element.removeAttr('id')
+
+        return
+      }
+
+      $element.attr('id', $anchorField.val())
 
       return
     }
@@ -1561,7 +1605,7 @@ jsBackend.pages.tree = {
       var $buttonText = $('[data-role="toggle-js-tree-collapse-text"]')
 
       if (collapsed) {
-        $buttonText.html(jsBackend.locale.lbl('OpenTreeNavigation'))
+        $buttonText.text(jsBackend.locale.lbl('OpenTreeNavigation'))
         $.each($('#tree div'), function (index, element) {
           $.tree.reference($(element).attr('id')).close_all()
         })
@@ -1569,7 +1613,7 @@ jsBackend.pages.tree = {
         return
       }
 
-      $buttonText.html(jsBackend.locale.lbl('CloseTreeNavigation'))
+      $buttonText.text(jsBackend.locale.lbl('CloseTreeNavigation'))
       $.each($('#tree div'), function (index, element) {
         $.tree.reference($(element).attr('id')).open_all()
       })
